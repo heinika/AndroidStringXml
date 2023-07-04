@@ -1,8 +1,12 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
@@ -18,7 +22,6 @@ import org.w3c.dom.NodeList
 import java.awt.FileDialog
 import java.io.ByteArrayInputStream
 import java.io.File
-import javax.swing.SwingUtilities
 import javax.xml.parsers.DocumentBuilderFactory
 
 @Composable
@@ -69,7 +72,7 @@ fun App() {
                 try {
                     val content = file.readText()
                     contentText = content
-                    chatgptText = "$contentText \n 将这段 xml 翻译成 ${selectedLanguage.joinToString(" ")}"
+                    chatgptText = "$contentText \n 将这段 xml 翻译成 ${selectedLanguage.joinToString(" ")} 以代码块的形式表现。"
                     xmlMap[Language.CN.languageName] = content
                     println(content)
                 } catch (e: Exception) {
