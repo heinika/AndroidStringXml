@@ -18,12 +18,14 @@ import org.w3c.dom.NodeList
 import java.awt.FileDialog
 import java.io.ByteArrayInputStream
 import java.io.File
+import javax.swing.SwingUtilities
 import javax.xml.parsers.DocumentBuilderFactory
 
 @Composable
 @Preview
 fun App() {
-    var path by remember { mutableStateOf("") }
+    var importXmlPath by remember { mutableStateOf("") }
+    var exportPath by remember { mutableStateOf(System.getProperty("user.home")) }
     var contentText by remember { mutableStateOf("") }
     val translateLanguages = Language.values().toList().subList(1, Language.values().size).map { it.languageName }
     val selectedLanguage = remember { mutableStateListOf<String>() }
@@ -32,22 +34,37 @@ fun App() {
     var chatgptText by remember { mutableStateOf("点击上方按钮生成 chatgpt 提示语") }
 
     Column {
-        Text(text = "导入的文件路径 $path", modifier = Modifier.padding(8.dp))
+        Text(text = "导入的文件路径 $importXmlPath", modifier = Modifier.padding(8.dp))
         Button(modifier = Modifier.padding(8.dp), onClick = {
             val fileDialog = FileDialog(ComposeWindow())
             fileDialog.isVisible = true
             val directory = fileDialog.directory
             val file = fileDialog.file
             if (directory != null && file != null) {
-                path = "$directory$file"
+                importXmlPath = "$directory$file"
             }
         }) {
             Text("选择要翻译的中文xml文件")
         }
 
+        Text(text = "导出的文件路径 $exportPath", modifier = Modifier.padding(8.dp))
+        Button(modifier = Modifier.padding(8.dp), onClick = {
+            val fileDialog = FileDialog(ComposeWindow(), "选择要导出的文件夹", FileDialog.LOAD)
+            fileDialog.file = null
+            fileDialog.directory = null
+            fileDialog.isMultipleMode = false
+            fileDialog.isVisible = true
+            val directory = fileDialog.directory
+            if (directory != null) {
+                exportPath = directory
+            }
+        }) {
+            Text("选择要导出的文件路径")
+        }
+
         Row {
             Button(modifier = Modifier.padding(8.dp), onClick = {
-                val file = File(path)
+                val file = File(importXmlPath)
 
                 try {
                     val content = file.readText()
@@ -79,8 +96,8 @@ fun App() {
             }
 
             Button(modifier = Modifier.padding(8.dp), onClick = {
-                val xmlFile = File("/home/chenlijin/Downloads/strings.xml")
-                val csvFile = File("/home/chenlijin/Downloads/output.csv")
+                val xmlFile = File(importXmlPath)
+                val csvFile = File(exportPath, "output.csv")
 
                 val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
                 val cnDoc: Document = docBuilder.parse(xmlFile)
@@ -140,7 +157,7 @@ fun App() {
             }
 
             Button(modifier = Modifier.padding(8.dp), onClick = {
-                val outputDir = File("/home/chenlijin/Downloads/output")
+                val outputDir = File(exportPath)
                 outputDir.mkdirs()
 
                 val valuesDir = File(outputDir, "values")
